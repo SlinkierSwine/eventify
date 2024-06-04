@@ -1,0 +1,13 @@
+# Python
+**/venv/
+**/__pycache__/
+**/*.log
+**/*.log.*
+
+# Env
+**/.env
+
+# Database
+**/*.sqlite3
+**/*.sqlite
+**/*.sqlite3-journal
