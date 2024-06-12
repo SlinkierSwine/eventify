@@ -36,7 +36,7 @@ if DEBUG:
         "Access-Control-Allow-Origin",
     )
 
-AUTH_USER_MODEL = "authentication.User"
+AUTH_USER_MODEL = "account.User"
 
 
 # Application definition
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Apps
-    'authentication',
+    'account',
 ]
 
 MIDDLEWARE = [
