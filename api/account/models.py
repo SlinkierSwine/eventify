@@ -7,6 +7,7 @@ from core.models import TimeStampableModel
 
 class User(AbstractBaseUser, TimeStampableModel, PermissionsMixin):
     email = models.EmailField("email", unique=True)
+    name = models.CharField("name", max_length=128, blank=True, null=True)
 
     is_staff = models.BooleanField("staff status", default=False)
     is_active = models.BooleanField("active", default=True)
