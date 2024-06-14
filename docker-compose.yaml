@@ -16,13 +16,15 @@ services:
       - ./api/.env
     environment:
       DB_HOST: db
+      DB_PORT: 5432
     depends_on:
       - db
     links:
       - db
 
   db:
-    hostname: db
+    ports:
+      - 5433:5432
     image: postgres:latest
     env_file:
       - ./api/.env

@@ -1,7 +1,6 @@
 from rest_framework import status
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from account.serializers import RegistrationSerializer
+from account.serializers import LoginSerializer, RegistrationSerializer
 from core.openapi.responses import OpenAPIResponsesDictType
 from core.openapi.responses import (
     OpenAPIResponsesDictType,
@@ -17,5 +16,5 @@ registration_responses: OpenAPIResponsesDictType = {
 
 login_responses: OpenAPIResponsesDictType = {
     **default_unauthorized_responses,
-    status.HTTP_200_OK: TokenObtainPairSerializer,
+    status.HTTP_200_OK: LoginSerializer,
 }

@@ -4,9 +4,8 @@ from rest_framework.mixins import Response
 from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.views import APIView, Request
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from account.serializers import RegistrationSerializer
+from account.serializers import LoginSerializer, RegistrationSerializer
 import account.openapi.responses as openapi_responses
 import account.openapi.examples as openapi_examples
 
@@ -27,14 +26,14 @@ class RegistrationAPIView(CreateAPIView):
 @extend_schema_view(
     post=extend_schema(
         summary="Login user if exists",
-        description="Password length must be between 9 and 128 characters",
+        description="Password length must be between 8 and 128 characters",
         examples=openapi_examples.login_examples,
         responses=openapi_responses.login_responses,
     )
 )
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
-    serializer_class = TokenObtainPairSerializer
+    serializer_class = LoginSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)

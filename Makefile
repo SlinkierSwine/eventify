@@ -15,9 +15,6 @@ build-%:
 logs-%:
 	docker-compose logs -f $($*)
 
-logs:
-	docker-compose logs -f
-
 # Separate services
 %-up:
 	docker-compose up $* -d
