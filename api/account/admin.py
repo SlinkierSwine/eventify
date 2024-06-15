@@ -19,4 +19,18 @@ class AccountAdmin(UserAdmin):
     fieldsets = ()
     filter_horizontal = ()
     ordering = ("-created_at",)
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "password1",
+                    "password2",
+                    "is_staff",
+                ),
+            },
+        ),
+    )
 

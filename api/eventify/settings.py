@@ -56,6 +56,8 @@ INSTALLED_APPS = [
 
     # Apps
     'account',
+    'event',
+    'notification',
 ]
 
 MIDDLEWARE = [

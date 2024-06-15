@@ -1,3 +1,8 @@
 [tool.pyright]
 venvPath = .
 venv = venv
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "eventify.settings"
+python_files = ["test_*.py", "*_tests.py", "tests.py"]
+filterwarnings = "ignore::DeprecationWarning"
