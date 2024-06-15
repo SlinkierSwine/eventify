@@ -1,4 +1,5 @@
 from typing import Any
+import datetime
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
@@ -29,6 +30,10 @@ class Event(TimeStampableModel):
         verbose_name_plural = "Events"
 
     def clean(self) -> None:
+        if self.start_datetime < datetime.datetime.now(datetime.UTC):
+            raise ValidationError(
+                {"start_time": "You can't create events in the past"}
+            )
         if self.start_datetime > self.end_datetime:
             raise ValidationError(
                 {"start_time": "Start datetime should be before end datetime"}
@@ -52,7 +57,7 @@ class AnonymousParticipant(TimeStampableModel):
 
 
 class EventParticipant(models.Model):
-    event = models.ForeignKey("Event", on_delete=models.CASCADE)
+    event = models.ForeignKey("Event", on_delete=models.CASCADE, related_name="participants")
 
     participant_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     participant_id = models.PositiveIntegerField()

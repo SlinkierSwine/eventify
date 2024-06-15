@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('participant_id', models.PositiveIntegerField()),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='event.event')),
+                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='participants', to='event.event')),
                 ('participant_content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
             ],
         ),
