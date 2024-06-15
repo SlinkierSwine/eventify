@@ -1,6 +1,6 @@
 [tool.pyright]
-venvPath = .
-venv = venv
+venvPath = "."
+venv = "venv"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "eventify.settings"

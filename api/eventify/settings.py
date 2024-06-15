@@ -167,6 +167,11 @@ LOGGING = {
             "propagate": False,
         },
         "": {"handlers": ["console", "file"], "level": "DEBUG", "propagate": False},
+        "faker": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
     "formatters": {
         "verbose": {

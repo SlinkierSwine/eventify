@@ -6,6 +6,8 @@ djangorestframework==3.15.1
 djangorestframework-camel-case==1.4.2
 djangorestframework-simplejwt==5.3.1
 drf-spectacular==0.27.2
+factory-boy==3.3.0
+Faker==25.8.0
 inflection==0.5.1
 iniconfig==2.0.0
 jsonschema==4.22.0
@@ -16,9 +18,12 @@ psycopg2==2.9.9
 psycopg2-binary==2.9.9
 PyJWT==2.8.0
 pytest==8.2.2
+pytest-django==4.8.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 PyYAML==6.0.1
 referencing==0.35.1
 rpds-py==0.18.1
+six==1.16.0
 sqlparse==0.5.0
 uritemplate==4.1.1
