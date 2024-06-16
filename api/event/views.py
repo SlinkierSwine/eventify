@@ -1,5 +1,5 @@
 from typing import Any
-from django.db.models.query import QuerySet
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -7,9 +7,9 @@ from rest_framework.viewsets import ModelViewSet
 
 from core.permissions import IsAuthenticatedOrRetrieveListOnlyViewSet
 from event.models import Event
-from event.serializers import EventSerializer
-from event.openapi import responses as openapi_responses
 from event.openapi import examples as openapi_examples
+from event.openapi import responses as openapi_responses
+from event.serializers import EventSerializer
 
 
 @extend_schema_view(

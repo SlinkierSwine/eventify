@@ -2,7 +2,6 @@ import datetime
 
 from drf_spectacular.utils import OpenApiExample
 
-
 now_dt = datetime.datetime.now(datetime.UTC)
 
 create_event_examples = [

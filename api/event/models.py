@@ -68,13 +68,18 @@ class EventParticipant(models.Model):
     )
 
     user = models.ForeignKey(
-        UserModel, on_delete=models.CASCADE, related_name="participating_events", blank=True, null=True
+        UserModel,
+        on_delete=models.CASCADE,
+        related_name="participating_events",
+        blank=True,
+        null=True,
     )
     anonymous_participant = models.ForeignKey(
         "AnonymousParticipant",
         on_delete=models.CASCADE,
         related_name="participating_events",
-        blank=True, null=True
+        blank=True,
+        null=True,
     )
 
     def __str__(self):

@@ -19,7 +19,15 @@ class EventParticipantInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "start_datetime", "end_datetime", "created_by", "is_canceled", "is_private")
+    list_display = (
+        "id",
+        "name",
+        "start_datetime",
+        "end_datetime",
+        "created_by",
+        "is_canceled",
+        "is_private",
+    )
     list_filter = ("is_canceled", "is_private", "start_datetime")
 
     inlines = (EventParticipantInline,)
