@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 
 from account.managers import UserManager
@@ -12,8 +11,6 @@ class User(AbstractBaseUser, TimeStampableModel, PermissionsMixin):
 
     is_staff = models.BooleanField("staff status", default=False)
     is_active = models.BooleanField("active", default=True)
-
-    participating_events = GenericRelation("event.EventParticipant", related_query_name="users")
 
     USERNAME_FIELD = "email"
 

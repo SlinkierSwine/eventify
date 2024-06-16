@@ -1,9 +1,7 @@
-from typing import Any
 import datetime
+from typing import Any
 
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -23,17 +21,20 @@ class Event(TimeStampableModel):
     is_canceled = models.BooleanField("is canceled", default=False)
     is_private = models.BooleanField("is private", default=False)
 
-    created_by = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="created_events")
+    created_by = models.ForeignKey(
+        UserModel, on_delete=models.CASCADE, related_name="created_events"
+    )
 
     class Meta:
         verbose_name = "Event"
         verbose_name_plural = "Events"
 
+    def __str__(self):
+        return f"Event '{self.name}'"
+
     def clean(self) -> None:
         if self.start_datetime < datetime.datetime.now(datetime.UTC):
-            raise ValidationError(
-                {"start_time": "You can't create events in the past"}
-            )
+            raise ValidationError({"start_time": "You can't create events in the past"})
         if self.start_datetime > self.end_datetime:
             raise ValidationError(
                 {"start_time": "Start datetime should be before end datetime"}
@@ -46,20 +47,50 @@ class Event(TimeStampableModel):
 
 
 class AnonymousParticipant(TimeStampableModel):
-    social_contact = models.CharField("social contact", max_length=256, help_text="Id of social account")
-    notification_provider = models.CharField("notification provider", choices=NotificationProvider.choices, max_length=128)
-
-    participating_event = GenericRelation("EventParticipant", related_query_name="anonymous_participants")
+    social_contact = models.CharField(
+        "social contact", max_length=256, help_text="Id of social account"
+    )
+    notification_provider = models.CharField(
+        "notification provider", choices=NotificationProvider.choices, max_length=128
+    )
 
     class Meta:
         verbose_name = "AnonymousParticipant"
         verbose_name_plural = "AnonymousParticipants"
 
+    def __str__(self):
+        return f"AnonymousParticipant {self.pk}"
+
 
 class EventParticipant(models.Model):
-    event = models.ForeignKey("Event", on_delete=models.CASCADE, related_name="participants")
+    event = models.ForeignKey(
+        "Event", on_delete=models.CASCADE, related_name="participants"
+    )
 
-    participant_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    participant_id = models.PositiveIntegerField()
-    participant = GenericForeignKey("participant_content_type", "participant_id")
+    user = models.ForeignKey(
+        UserModel, on_delete=models.CASCADE, related_name="participating_events", blank=True, null=True
+    )
+    anonymous_participant = models.ForeignKey(
+        "AnonymousParticipant",
+        on_delete=models.CASCADE,
+        related_name="participating_events",
+        blank=True, null=True
+    )
 
+    def __str__(self):
+        return f"EventParticipant {self.pk}"
+
+    def clean(self) -> None:
+        if self.user and self.anonymous_participant:
+            raise ValidationError(
+                {
+                    "anonymous_participant": "Event participant can be only user or anonymous, but not at the same time"
+                }
+            )
+        if not (self.user and self.anonymous_participant):
+            raise ValidationError(
+                {
+                    "anonymous_participant": "Event participant should have at least one of user or anonymous"
+                }
+            )
+        return super().clean()
