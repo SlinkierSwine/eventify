@@ -1,11 +1,11 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.mixins import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.views import APIView, Request
 
-from account.serializers import LoginSerializer, RegistrationSerializer
+from account.serializers import LoginSerializer, RegistrationSerializer, UserSerializer
 import account.openapi.responses as openapi_responses
 import account.openapi.examples as openapi_examples
 
@@ -40,3 +40,24 @@ class LoginAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Retrieve current user",
+        responses=openapi_responses.get_current_user_responses,
+    ),
+    put=extend_schema(
+        exclude=True,
+    ),
+    patch=extend_schema(
+        summary="Partially update current user",
+        responses=openapi_responses.partially_update_current_user_responses,
+    ),
+)
+class CurrentUserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+    permissions = (IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user

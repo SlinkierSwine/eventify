@@ -43,3 +43,10 @@ class LoginSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
 
         return data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ("id", "email", "name")
+        read_only_fields = ("email",)

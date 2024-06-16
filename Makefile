@@ -15,6 +15,9 @@ build-%:
 logs-%:
 	docker-compose logs -f $($*)
 
+restart-%:
+	docker-compose restart $($*)
+
 # Separate services
 %-up:
 	docker-compose up $* -d
@@ -27,6 +30,9 @@ logs-%:
 
 %-logs:
 	docker-compose logs -f $*
+
+%-restart:
+	docker-compose restart $*
 
 # List all services
 list:
