@@ -2,8 +2,8 @@ from django.urls import reverse
 import pytest
 from rest_framework import status
 
-login_url = reverse("account:login")
-registration_url = reverse("account:registration")
+login_url = "account:login"
+registration_url = "account:registration"
 
 
 @pytest.mark.parametrize(
@@ -15,8 +15,8 @@ registration_url = reverse("account:registration")
     ]
 )
 def test_login_view(email, password, expected_code, api_client, db):
-    api_client.post(registration_url, data={"email": "right@email.com", "password": "RightPassword123"})
+    api_client.post(reverse(registration_url), data={"email": "right@email.com", "password": "RightPassword123"})
 
-    response = api_client.post(login_url, data={"email": email, "password": password})
+    response = api_client.post(reverse(login_url), data={"email": email, "password": password})
 
     assert response.status_code == expected_code
