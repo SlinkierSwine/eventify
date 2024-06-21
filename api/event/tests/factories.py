@@ -2,8 +2,9 @@ import datetime
 
 import factory
 
-from event.models import Event
 from core.utils import get_tomorrow_date
+from event.models import Event
+from event.tests.utils import get_datetime_for_event
 
 
 class EventFactory(factory.django.DjangoModelFactory):
@@ -11,11 +12,13 @@ class EventFactory(factory.django.DjangoModelFactory):
         model = Event
 
     name = factory.Faker("word")
-    start_datetime = datetime.datetime.combine(
-        date=get_tomorrow_date(), time=datetime.time(hour=10)
+    start_datetime = get_datetime_for_event(
+        get_tomorrow_date(),
+        "10:00",
     )
-    end_datetime = datetime.datetime.combine(
-        date=get_tomorrow_date(), time=datetime.time(hour=11)
+    end_datetime = get_datetime_for_event(
+        get_tomorrow_date(),
+        "11:00",
     )
 
-    created_by = factory.SubFactory("UserFactory")
+    created_by = factory.SubFactory("account.tests.factories.UserFactory")

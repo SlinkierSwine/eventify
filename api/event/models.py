@@ -4,6 +4,7 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+import pytz
 
 from core.models import TimeStampableModel
 from notification.models import NotificationProvider
@@ -33,7 +34,7 @@ class Event(TimeStampableModel):
         return f"Event '{self.name}'"
 
     def clean(self) -> None:
-        if self.start_datetime <= datetime.datetime.now(datetime.UTC):
+        if self.start_datetime <= datetime.datetime.now(pytz.UTC):
             raise ValidationError({"start_time": "You can't create events in the past"})
         if self.start_datetime >= self.end_datetime:
             raise ValidationError(

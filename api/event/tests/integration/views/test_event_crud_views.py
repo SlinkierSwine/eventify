@@ -1,20 +1,12 @@
-import datetime
-
 import pytest
 from django.urls import reverse
 from rest_framework import status
 
 from core.utils import get_tomorrow_date, get_yesterday_date
+from event.tests.utils import get_datetime_for_event
 
-create_event_url = reverse("event:event_create")
-
-
-def get_datetime_for_event(
-    date: datetime.date, time: str, format: str = "%H:%M"
-) -> datetime.datetime:
-    return datetime.datetime.combine(
-        date, datetime.datetime.strptime(time, format).time()
-    )
+event_create_url = "event:event_create"
+event_retrieve_update_destroy_url = "event:event_retrieve_update_destroy"
 
 
 @pytest.mark.parametrize(
@@ -53,6 +45,38 @@ def test_create_event_view(
     }
 
     api_client = api_client_with_credentials(user)
-    response = api_client.post(create_event_url, data=data)
+    response = api_client.post(reverse(event_create_url), data=data)
 
     assert response.status_code == expected_code
+
+
+@pytest.mark.parametrize(
+    "data, expected_code",
+    [
+        ({"name": "New name"}, status.HTTP_200_OK),
+        ({"description": "New description"}, status.HTTP_200_OK),
+        (
+            {"start_datetime": get_datetime_for_event(get_tomorrow_date(), "5:00")},
+            status.HTTP_200_OK,
+        ),
+        (
+            {
+                "start_datetime": get_datetime_for_event(get_tomorrow_date(), "15:00"),
+                "end_datetime": get_datetime_for_event(get_tomorrow_date(), "16:00"),
+            },
+            status.HTTP_200_OK,
+        ),
+    ],
+)
+def test_update_event_view(data, expected_code, event, api_client_with_credentials, db):
+    user = event.created_by
+    api_client = api_client_with_credentials(user)
+
+    url = reverse(event_retrieve_update_destroy_url, kwargs={"pk": event.pk})
+    response = api_client.patch(url, data=data)
+
+    assert response.status_code == expected_code
+
+    event.refresh_from_db()
+    for key, value in data.items():
+        assert getattr(event, key) == value
