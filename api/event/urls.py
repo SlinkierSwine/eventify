@@ -6,8 +6,8 @@ app_name = "event"
 urlpatterns = [
     path(
         "<int:pk>",
-        EventViewSet.as_view({"get": "retrieve", "patch": "partial_update"}),
-        name="event_retrieve_update",
+        EventViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
+        name="event_retrieve_update_destroy",
     ),
     path(
         "",

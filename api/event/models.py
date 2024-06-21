@@ -33,9 +33,9 @@ class Event(TimeStampableModel):
         return f"Event '{self.name}'"
 
     def clean(self) -> None:
-        if self.start_datetime < datetime.datetime.now(datetime.UTC):
+        if self.start_datetime <= datetime.datetime.now(datetime.UTC):
             raise ValidationError({"start_time": "You can't create events in the past"})
-        if self.start_datetime > self.end_datetime:
+        if self.start_datetime >= self.end_datetime:
             raise ValidationError(
                 {"start_time": "Start datetime should be before end datetime"}
             )

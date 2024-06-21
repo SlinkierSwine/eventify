@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from account.serializers import UserSerializer
@@ -23,7 +24,11 @@ class EventSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            event = super().create(validated_data)
+            try:
+                event = super().create(validated_data)
+            except DjangoValidationError as e:
+                raise serializers.ValidationError(e.error_dict)
+
             EventService.create_event_participants(event, [event.created_by])
 
         return event

@@ -1,3 +1,5 @@
+# Global conftest file
+
 import pytest
 from rest_framework.test import APIClient
 

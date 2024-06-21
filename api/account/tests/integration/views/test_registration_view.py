@@ -6,7 +6,7 @@ registration_url = reverse("account:registration")
 
 
 @pytest.mark.parametrize(
-    "email, password, expected",
+    "email, password, expected_code",
     [
         ("right@email.com", "RightPassword123", status.HTTP_201_CREATED),
         ("wrongemail.com", "RightPassword123", status.HTTP_400_BAD_REQUEST),
@@ -14,10 +14,10 @@ registration_url = reverse("account:registration")
         ("", "", status.HTTP_400_BAD_REQUEST),
     ]
 )
-def test_registration_view(email, password, expected, api_client, db):
+def test_registration_view(email, password, expected_code, api_client, db):
     response = api_client.post(registration_url, data={"email": email, "password": password})
 
-    assert response.status_code == expected
+    assert response.status_code == expected_code
 
 
 def test_cant_register_twice(api_client, db):

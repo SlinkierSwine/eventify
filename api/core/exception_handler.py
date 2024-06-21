@@ -22,8 +22,9 @@ def custom_exception_handler(exc: Exception, context: Any) -> Response:
             content_type="application/json",
         )
     # Now add the HTTP status code to the response.
-    if response is not None:
+    else:
         response.data["status_code"] = response.status_code
+
 
     logger.error(exc, exc_info=True)
 

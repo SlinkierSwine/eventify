@@ -31,6 +31,10 @@ from event.serializers import EventSerializer
         summary="Get all user's event",
         responses=openapi_responses.retrieve_event_responses,
     ),
+    destroy=extend_schema(
+        summary="Delete event",
+        responses=openapi_responses.retrieve_event_responses,
+    ),
 )
 class EventViewSet(ModelViewSet):
     queryset = Event.objects.all()
