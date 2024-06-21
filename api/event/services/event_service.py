@@ -1,9 +1,12 @@
+import logging
 from typing import Iterable
 
 from django.contrib.auth.base_user import AbstractBaseUser
 
 from event.exceptions import EventException
 from event.models import AnonymousParticipant, Event, EventParticipant
+
+logger = logging.getLogger(__name__)
 
 
 class EventService:
@@ -39,3 +42,14 @@ class EventService:
                 )
 
             event.participants.add(event_participant)
+            logger.info(f"{participant} is now participating in {event} ({event_participant})")
+
+    @classmethod
+    def validate_not_canceled(cls, event: Event) -> None:
+        if event.is_canceled:
+            raise EventException("Event is canceled")
+
+    @classmethod
+    def validate_not_private(cls, event: Event) -> None:
+        if event.is_private:
+            raise EventException("Event is private")

@@ -30,3 +30,9 @@ list_event_responses: OpenAPIResponsesDictType = {
     **default_responses,
     status.HTTP_200_OK: EventSerializer,
 }
+
+add_user_participant_responses: OpenAPIResponsesDictType = {
+    **default_responses,
+    **not_found_responses,
+    status.HTTP_200_OK: None,
+}

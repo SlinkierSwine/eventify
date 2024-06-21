@@ -1,15 +1,22 @@
 from typing import Any
 
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import status
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from core.permissions import IsAuthenticatedOrRetrieveListOnlyViewSet
+from event.exceptions import EventException
 from event.models import Event
 from event.openapi import examples as openapi_examples
 from event.openapi import responses as openapi_responses
+from event.permissions import IsEventOwnerOrReadOnly
 from event.serializers import EventSerializer
+from event.services.event_service import EventService
 
 
 @extend_schema_view(
@@ -39,15 +46,44 @@ from event.serializers import EventSerializer
 class EventViewSet(ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = (IsAuthenticatedOrRetrieveListOnlyViewSet,)
+    permission_classes = (IsEventOwnerOrReadOnly,)
+
+    def get_object(self):
+        obj = super().get_object()
+
+        if obj.is_private and self.request.user != obj.created_by:
+            raise EventException("Event is private")
+
+        return obj
 
     def perform_create(self, serializer: EventSerializer):
         user = self.request.user
         return serializer.save(created_by=user)
 
-    def list(self, request: Request, *args: Any, **kwargs: Any):
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user_id = kwargs["user_id"]
-        queryset = self.get_queryset().filter(created_by__id=user_id)
+        filter_is_private = Q() if user_id == request.user.id else Q(is_private=False)
+        queryset = self.get_queryset().filter(created_by__id=user_id).filter(filter_is_private)
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Add user to event's participants",
+        responses=openapi_responses.add_user_participant_responses,
+    )
+)
+class AddUserParticipantAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        event_id = self.kwargs["pk"]
+        event = get_object_or_404(Event, pk=event_id)
+        EventService.validate_not_canceled(event)
+        EventService.validate_not_private(event)
+
+        EventService.create_event_participants(event, [request.user])
+
+        return Response(status=status.HTTP_200_OK)

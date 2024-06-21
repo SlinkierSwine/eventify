@@ -1,6 +1,6 @@
 from django.urls import path
 
-from event.views import EventViewSet
+from event.views import EventViewSet, AddUserParticipantAPIView
 
 app_name = "event"
 urlpatterns = [
@@ -18,5 +18,10 @@ urlpatterns = [
         "list/<int:user_id>",
         EventViewSet.as_view({"get": "list"}),
         name="event_list",
+    ),
+    path(
+        "<int:pk>/participate",
+        AddUserParticipantAPIView.as_view(),
+        name="add_user_participant",
     ),
 ]
