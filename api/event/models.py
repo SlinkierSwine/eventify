@@ -31,7 +31,7 @@ class Event(TimeStampableModel):
         verbose_name_plural = "Events"
 
     def __str__(self):
-        return f"Event '{self.name}'"
+        return f"Event {self.pk} '{self.name}'"
 
     def clean(self) -> None:
         if self.start_datetime <= datetime.datetime.now(pytz.UTC):
@@ -60,7 +60,7 @@ class AnonymousParticipant(TimeStampableModel):
         verbose_name_plural = "AnonymousParticipants"
 
     def __str__(self):
-        return f"AnonymousParticipant {self.pk}"
+        return f"AnonymousParticipant {self.pk}, {self.notification_provider} ID: {self.social_contact}"
 
 
 class EventParticipant(models.Model):

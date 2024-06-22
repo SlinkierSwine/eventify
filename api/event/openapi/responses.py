@@ -36,3 +36,9 @@ add_user_participant_responses: OpenAPIResponsesDictType = {
     **not_found_responses,
     status.HTTP_200_OK: None,
 }
+
+user_accepts_invitation_responses: OpenAPIResponsesDictType = {
+    **default_responses,
+    **not_found_responses,
+    status.HTTP_200_OK: None,
+}

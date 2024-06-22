@@ -3,20 +3,21 @@ from typing import Any
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
-from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import CreateAPIView, get_object_or_404
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from event.exceptions import EventException
-from event.models import Event
+from event.models import AnonymousParticipant, Event
 from event.openapi import examples as openapi_examples
 from event.openapi import responses as openapi_responses
 from event.permissions import IsEventOwnerOrReadOnly
-from event.serializers import EventSerializer
+from event.serializers import AnonymousParticipantSerializer, EventSerializer
 from event.services.event_service import EventService
+from event.services.invitation_service import InvitationService
 
 
 @extend_schema_view(
@@ -77,6 +78,7 @@ class EventViewSet(ModelViewSet):
 )
 class AddUserParticipantAPIView(APIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = None
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         event_id = self.kwargs["pk"]
@@ -84,6 +86,49 @@ class AddUserParticipantAPIView(APIView):
         EventService.validate_not_canceled(event)
         EventService.validate_not_private(event)
 
-        EventService.create_event_participants(event, [request.user])
+        EventService.add_event_participant(event, request.user)
 
         return Response(status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="User accepts invitation to event",
+        responses=openapi_responses.add_user_participant_responses,
+    )
+)
+class UserAcceptInvitationAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = None
+
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        uid = self.kwargs["uid"]
+        event = InvitationService.get_event_from_uid(uid)
+        EventService.validate_not_canceled(event)
+
+        EventService.add_event_participant(event, request.user)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Anonymos participant accepts invitation to event",
+        responses=openapi_responses.user_accepts_invitation_responses,
+    )
+)
+class AnonAcceptInvitationAPIView(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = AnonymousParticipantSerializer
+
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        uid = self.kwargs["uid"]
+        event = InvitationService.get_event_from_uid(uid)
+        EventService.validate_not_canceled(event)
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(event=event)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

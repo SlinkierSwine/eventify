@@ -28,6 +28,7 @@ DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+API_DOMAIN = os.environ.get("API_DOMAIN", "http://localhost:8000")
 
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
@@ -235,3 +236,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,  # for file upload
 }
+
+
+# Invitation url
+EVENT_INVITATION_URL = API_DOMAIN + "/event-invitation"

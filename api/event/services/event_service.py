@@ -1,5 +1,4 @@
 import logging
-from typing import Iterable
 
 from django.contrib.auth.base_user import AbstractBaseUser
 
@@ -11,38 +10,33 @@ logger = logging.getLogger(__name__)
 
 class EventService:
     @classmethod
-    def create_event_participants(
+    def add_event_participant(
         cls,
         event: Event,
-        participants: Iterable[AbstractBaseUser | AnonymousParticipant],
-    ):
-        for participant in participants:
+        participant: AbstractBaseUser | AnonymousParticipant,
+    ) -> None:
+        if isinstance(participant, AbstractBaseUser):
+            event_participant, created = EventParticipant.objects.get_or_create(
+                event=event, user=participant
+            )
 
-            if isinstance(participant, AbstractBaseUser):
-                event_participant, created = EventParticipant.objects.get_or_create(
-                    event=event, user=participant
-                )
-                if not created:
-                    raise EventException(
-                        f"{participant} is already participating in {event}"
-                    )
+        elif isinstance(participant, AnonymousParticipant):
+            event_participant, created = EventParticipant.objects.get_or_create(
+                event=event, anonymous_participant=participant
+            )
 
-            elif isinstance(participant, AnonymousParticipant):
-                event_participant, created = EventParticipant.objects.get_or_create(
-                    event=event, anonymous_participant=participant
-                )
-                if not created:
-                    raise EventException(
-                        f"Participant with {participant.notification_provider} ID = {participant.social_contact} is already participating in {event}"
-                    )
+        else:
+            raise EventException(
+                "Event participant can be only user or anonymous participant"
+            )
 
-            else:
-                raise EventException(
-                    "Event participant can be only user or anonymous participant"
-                )
+        if not created:
+            raise EventException(f"{participant} is already participating in {event}")
 
-            event.participants.add(event_participant)
-            logger.info(f"{participant} is now participating in {event} ({event_participant})")
+        event.participants.add(event_participant)
+        logger.info(
+            f"{participant} is now participating in {event} ({event_participant})"
+        )
 
     @classmethod
     def validate_not_canceled(cls, event: Event) -> None:
@@ -53,3 +47,13 @@ class EventService:
     def validate_not_private(cls, event: Event) -> None:
         if event.is_private:
             raise EventException("Event is private")
+
+    @classmethod
+    def validate_anon_is_already_participating(
+        cls, event: Event, anon: AnonymousParticipant
+    ) -> None:
+        if EventParticipant.objects.filter(
+            anonymous_participant__notification_provider=anon.notification_provider,
+            anonymous_participant__social_contact=anon.social_contact,
+        ).exists():
+            raise EventException(f"{anon} is already participating in {event}")
