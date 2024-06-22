@@ -47,8 +47,11 @@ class AnonymousParticipantSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: Any) -> AnonymousParticipant:
         event = validated_data.pop("event")
-        anon, _ = AnonymousParticipant.objects.get_or_create(**validated_data)
-        EventService.validate_anon_is_already_participating(event, anon)
+
+        anon, created = AnonymousParticipant.objects.get_or_create(**validated_data)
+        if not created:
+            EventService.validate_anon_is_already_participating(event, anon)
+
         EventService.add_event_participant(event, anon)
 
         return anon

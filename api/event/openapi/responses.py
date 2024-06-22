@@ -6,7 +6,7 @@ from core.openapi.responses import (
     default_unauthorized_responses,
     not_found_responses,
 )
-from event.serializers import EventSerializer
+from event.serializers import AnonymousParticipantSerializer, EventSerializer
 
 
 create_event_responses: OpenAPIResponsesDictType = {
@@ -39,6 +39,10 @@ add_user_participant_responses: OpenAPIResponsesDictType = {
 
 user_accepts_invitation_responses: OpenAPIResponsesDictType = {
     **default_responses,
-    **not_found_responses,
     status.HTTP_200_OK: None,
+}
+
+anonymous_participant_accepts_invitation_responses: OpenAPIResponsesDictType = {
+    **default_responses,
+    status.HTTP_201_CREATED: AnonymousParticipantSerializer,
 }

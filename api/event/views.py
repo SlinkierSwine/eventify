@@ -114,7 +114,7 @@ class UserAcceptInvitationAPIView(APIView):
 @extend_schema_view(
     post=extend_schema(
         summary="Anonymos participant accepts invitation to event",
-        responses=openapi_responses.user_accepts_invitation_responses,
+        responses=openapi_responses.anonymous_participant_accepts_invitation_responses,
     )
 )
 class AnonAcceptInvitationAPIView(APIView):
