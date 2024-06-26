@@ -2,9 +2,11 @@ import datetime
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.exceptions import ValidationError
 from django.db import models
 import pytz
+import humanize
 
 from core.models import TimeStampableModel
 from notification.providers.choices import NotificationProviderChoices
@@ -48,6 +50,9 @@ class Event(TimeStampableModel):
         self.full_clean()
         return super().save(*args, **kwargs)
 
+    def get_time_before_start_text(self) -> str:
+        humanize.naturaltime(datetime.timedelta(minutes=self.notify_before_minutes))
+
 
 class AnonymousParticipant(TimeStampableModel):
     social_contact = models.CharField(
@@ -86,7 +91,7 @@ class EventParticipant(models.Model):
     )
 
     def __str__(self):
-        return f"EventParticipant {self.pk}"
+        return f"EventParticipant {self.pk}: {self.get_participant()}"
 
     def clean(self) -> None:
         if self.user and self.anonymous_participant:
@@ -102,3 +107,12 @@ class EventParticipant(models.Model):
                 }
             )
         return super().clean()
+
+    @property
+    def is_anonymous(self) -> bool:
+        return self.anonymous_participant is not None
+    
+    def get_participant(self) -> AbstractBaseUser | AnonymousParticipant:
+        if self.is_anonymous:
+            return self.anonymous_participant
+        return self.user

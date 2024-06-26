@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 
 from event.exceptions import EventException
 from event.models import AnonymousParticipant, Event, EventParticipant
+from notification.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -16,27 +17,39 @@ class EventService:
         participant: AbstractBaseUser | AnonymousParticipant,
     ) -> None:
         if isinstance(participant, AbstractBaseUser):
-            event_participant, created = EventParticipant.objects.get_or_create(
-                event=event, user=participant
-            )
-
+            data = {"event": event, "user": participant}
         elif isinstance(participant, AnonymousParticipant):
-            event_participant, created = EventParticipant.objects.get_or_create(
-                event=event, anonymous_participant=participant
-            )
-
+            data = {"event": event, "anonymous_participant": participant}
         else:
             raise EventException(
                 "Event participant can be only user or anonymous participant"
             )
 
-        if not created:
-            raise EventException(f"{participant} is already participating in {event}")
+        event_participant = cls._participate_or_error(data)
 
         event.participants.add(event_participant)
         logger.info(
             f"{participant} is now participating in {event} ({event_participant})"
         )
+
+        NotificationService.add_notification(event_participant, cls.get_notification_message(event))
+
+    @classmethod
+    def _participate_or_error(cls, data: dict) -> EventParticipant:
+        event_participant, created = EventParticipant.objects.get_or_create(data)
+
+        if not created:
+            raise EventException(
+                f"{event_participant.get_participant} is already participating in {event_participant.event}"
+            )
+
+        return event_participant
+
+    @classmethod
+    def get_notification_message(cls, event: Event) -> str:
+        msg = f"Event {event.name} is in {event.get_time_before_start_text()}"
+        msg = msg + f"\n\n{event.description}" if event.description else msg
+        return msg
 
     @classmethod
     def validate_not_canceled(cls, event: Event) -> None:
