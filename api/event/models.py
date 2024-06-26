@@ -7,7 +7,7 @@ from django.db import models
 import pytz
 
 from core.models import TimeStampableModel
-from notification.models import NotificationProvider
+from notification.providers.choices import NotificationProviderChoices
 
 UserModel = get_user_model()
 
@@ -18,6 +18,8 @@ class Event(TimeStampableModel):
 
     start_datetime = models.DateTimeField("start datetime")
     end_datetime = models.DateTimeField("end datetime")
+
+    notify_before_minutes = models.IntegerField("notify before minutes", default=30)
 
     is_canceled = models.BooleanField("is canceled", default=False)
     is_private = models.BooleanField("is private", default=False)
@@ -52,7 +54,7 @@ class AnonymousParticipant(TimeStampableModel):
         "social contact", max_length=256, help_text="Id of social account"
     )
     notification_provider = models.CharField(
-        "notification provider", choices=NotificationProvider.choices, max_length=128
+        "notification provider", choices=NotificationProviderChoices.choices, max_length=128
     )
 
     class Meta:

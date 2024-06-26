@@ -1,4 +1,4 @@
-backend = api db
+backend = api db redis rabbitmq celery
 frontend = 
 all = $(backend) $(frontend)
 

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
+    "django_celery_results",
 
     # Apps
     'account',
@@ -240,3 +241,30 @@ SPECTACULAR_SETTINGS = {
 
 # Invitation url
 EVENT_INVITATION_URL = API_DOMAIN + "/event-invitation"
+
+
+# Redis settings
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/",
+        "TIMEOUT": 60 * 15,  # default, in seconds: 60 * 15 (15 minutes)
+    }
+}
+
+
+# RabbitMQ
+RABBIT_HOST = os.environ.get("RABBIT_HOST", "localhost")
+RABBIT_PORT = os.environ.get("RABBIT_PORT", 5672)
+RABBIT_USER = os.environ.get("RABBIT_USER")
+RABBIT_PASSWORD = os.environ.get("RABBIT_PASSWORD")
+
+
+# Celery settings
+CELERY_BROKER_URL = f"amqp://{RABBIT_USER}:{RABBIT_PASSWORD}@{RABBIT_HOST}:{RABBIT_PORT}//"
+result_backend = "django-db"
+accept_content = ["application/json"]
+result_serializer = "json"
+task_serializer = "json"
