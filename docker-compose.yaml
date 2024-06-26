@@ -36,6 +36,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:latest
+    container_name: rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -44,6 +45,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
@@ -53,6 +55,8 @@ services:
     build:
       context: ./api/
     image: api-image
+    restart: unless-stopped
+    container_name: celery
     command: celery --app eventify worker -P solo
     depends_on:
       - api
@@ -63,12 +67,6 @@ services:
       - ./api/:/src
     environment:
       - RABBIT_HOST=rabbitmq
-      - RABBIT_PORT=5672
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
 
 volumes:
   redis:

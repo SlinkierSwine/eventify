@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'account',
     'event',
     'notification',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -174,6 +175,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
+        "celery": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
     "formatters": {
         "verbose": {
@@ -268,3 +274,17 @@ result_backend = "django-db"
 accept_content = ["application/json"]
 result_serializer = "json"
 task_serializer = "json"
+
+
+# Email settings
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

@@ -3,7 +3,7 @@ from typing import Iterable
 
 from event.models import Event, EventParticipant
 from notification.models import Notification
-from notification.providers.base import BaseNotificationProvider
+from notification.providers.base_provider import BaseNotificationProvider
 from notification.providers.choices import NotificationProviderChoices
 from notification.providers.get_provider import get_provider
 
@@ -36,7 +36,7 @@ class NotificationService:
             notification_providers = [c[0] for c in NotificationProviderChoices.choices]
             provider_names = receiver.user.social_accounts.filter(
                 provider__in=notification_providers, use_for_notifications=True
-            ).all()
+            ).values_list("provider", flat=True)
             return [get_provider(name) for name in provider_names]
 
     @classmethod

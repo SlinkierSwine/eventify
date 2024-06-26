@@ -1,0 +1,2 @@
+class NotificationProviderException(Exception):
+    pass
