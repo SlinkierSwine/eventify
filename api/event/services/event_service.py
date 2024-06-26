@@ -36,11 +36,11 @@ class EventService:
 
     @classmethod
     def _participate_or_error(cls, data: dict) -> EventParticipant:
-        event_participant, created = EventParticipant.objects.get_or_create(data)
+        event_participant, created = EventParticipant.objects.get_or_create(**data)
 
         if not created:
             raise EventException(
-                f"{event_participant.get_participant} is already participating in {event_participant.event}"
+                f"{event_participant.get_participant()} is already participating in {event_participant.event}"
             )
 
         return event_participant

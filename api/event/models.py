@@ -38,11 +38,11 @@ class Event(TimeStampableModel):
         return f"Event {self.pk} '{self.name}'"
 
     def clean(self) -> None:
-        if self.start_datetime <= datetime.datetime.now(pytz.UTC):
-            raise ValidationError({"start_time": "You can't create events in the past"})
+        if self.pk is None and self.start_datetime <= datetime.datetime.now(pytz.UTC):
+            raise ValidationError({"start_datetime": "You can't create events in the past"})
         if self.start_datetime >= self.end_datetime:
             raise ValidationError(
-                {"start_time": "Start datetime should be before end datetime"}
+                {"start_datetime": "Start datetime should be before end datetime"}
             )
         return super().clean()
 
@@ -100,7 +100,7 @@ class EventParticipant(models.Model):
                     "anonymous_participant": "Event participant can be only user or anonymous, but not at the same time"
                 }
             )
-        if not (self.user and self.anonymous_participant):
+        if not (self.user or self.anonymous_participant):
             raise ValidationError(
                 {
                     "anonymous_participant": "Event participant should have at least one of user or anonymous"

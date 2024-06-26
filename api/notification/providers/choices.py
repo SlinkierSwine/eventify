@@ -4,7 +4,7 @@ from account.social_account_choices import SocialAccountChoices
 
 
 class NotificationProviderChoices(models.TextChoices):
-    EMAIL = "email"
+    EMAIL = SocialAccountChoices.EMAIL
     WEB = "web"
     VK = SocialAccountChoices.VK
     GOOGLE = SocialAccountChoices.GOOGLE

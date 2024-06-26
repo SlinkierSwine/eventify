@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from account.models import User
+from account.models import SocialAccount, User
 
 
 @admin.register(User)
@@ -34,3 +34,7 @@ class AccountAdmin(UserAdmin):
         ),
     )
 
+
+@admin.register(SocialAccount)
+class SocialAccountAdmin(admin.ModelAdmin):
+    list_display = ("id", "provider", "user", "use_for_notifications")
